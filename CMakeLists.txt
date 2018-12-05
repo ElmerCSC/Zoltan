@@ -1,10 +1,52 @@
+PROJECT(Zoltan C CXX Fortran)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.9)
 
+SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_ROOT}/Modules)
+
+INCLUDE(tribits_macros.cmake)
+
+# MPI Related things
+SET(TPL_ENABLE_MPI TRUE INTERNAL)
+SET(WITH_MPI TRUE INTERNAL)
+
+SET(PACKAGE_NAME "Zoltan" CACHE STRING "")
+SET(Zoltan_ENABLE_CXX FALSE CACHE BOOL "")
+SET(Zoltan_ENABLE_Fortran TRUE CACHE BOOL "")
+SET(BUILD_ZOLTAN_F90_INTERFACE CACHE BOOL "")
+SET(Zoltan_ENABLE_CPPDRIVER FALSE CACHE BOOL "")
+
+SET(${PACKAGE_NAME}_ENABLE_METIS FALSE CACHE STRING "" )
+SET(${PACKAGE_NAME}_ENABLE_ParMETIS FALSE CACHE STRING "" )
+SET(${PACKAGE_NAME}_ENABLE_PaToH FALSE CACHE STRING "" )
+SET(${PACKAGE_NAME}_ENABLE_Scotch FALSE CACHE STRING "" )
+SET(${PACKAGE_NAME}_ENABLE_OVIS FALSE CACHE STRING "" )
+SET(${PACKAGE_NAME}_ENABLE_Zlib FALSE CACHE STRING "" )
+SET(${PACKAGE_NAME}_ENABLE_PURIFY FALSE CACHE STRING "" )
+
+IF(WITH_MPI)
+  # Advanced properties
+  MARK_AS_ADVANCED(
+    MPI_EXTRA_LIBRARY
+    MPI_LIBRARY
+    )
+
+  FIND_PACKAGE(MPI REQUIRED)
+  # Workaround if MPI is found but MPI_FOUND is not set (windows+msmpi+findmpi)
+  SET(MPI_FOUND TRUE CACHE BOOL "")
+  MARK_AS_ADVANCED(MPI_FOUND)
+  INCLUDE_DIRECTORIES(${MPI_Fortran_INCLUDE_PATH})
+  # MPI libraries may be needed for testing
+  SET(CMAKE_C_REQUIRED_LIBRARIES ${MPI_C_LIBRARIES})
+  SET(CMAKE_CXX_REQUIRED_LIBRARIES ${MPI_CXX_LIBRARIES})
+  SET(CMAKE_Fortran_REQUIRED_LIBRARIES ${MPI_Fortran_LIBRARIES})
+ENDIF(WITH_MPI)
+
+CONFIGURE_FILE("cmake/Zoltan_config.h.in" 
+  ${CMAKE_CURRENT_BINARY_DIR}/Zoltan_config.h)
 
 #
 # A) Define the package
 #
-
-TRIBITS_PACKAGE(Zoltan)
 
 #
 # B) Set up package-specific options
@@ -38,16 +80,14 @@ TRIBITS_ADD_OPTION_AND_DEFINE(${PACKAGE_NAME}_ENABLE_KNUTH_HASH
 TRIBITS_ADD_OPTION_AND_DEFINE(${PACKAGE_NAME}_ENABLE_F90INTERFACE
   BUILD_ZOLTAN_F90_INTERFACE
   "Enable build of F90 interface to ${PACKAGE_NAME}."
-  OFF )
+  ON )
 
 TRIBITS_ADD_OPTION_AND_DEFINE(${PACKAGE_NAME}_ENABLE_PURIFY
   HAVE_PURIFY
   "Enable work-arounds to purify bugs."
   OFF )
 
-OPTION(${PACKAGE_NAME}_ENABLE_CPPDRIVER
-  "Enable C++ driver for ${PACKAGE_NAME}."
-  ${${PROJECT_NAME}_ENABLE_CXX} )
+OPTION(${PACKAGE_NAME}_ENABLE_CPPDRIVER "Enable C++ driver for ${PACKAGE_NAME}." ${${PROJECT_NAME}_ENABLE_CXX} )
 
 IF (${PROJECT_NAME}_ENABLE_CXX) 
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMPICH_IGNORE_CXX_SEEK")
@@ -73,14 +113,14 @@ ENDIF()
 # C) Add the libraries, tests, and examples
 #
 
-IF (NOT TPL_ENABLE_MPI)
-  ADD_SUBDIRECTORY(siMPI)
-  SET(ZOLTAN_BUILD_ZFDRIVE NO)
-ENDIF()
+# IF (NOT TPL_ENABLE_MPI)
+#   ADD_SUBDIRECTORY(siMPI)
+#   SET(ZOLTAN_BUILD_ZFDRIVE NO)
+# ENDIF()
 
 ADD_SUBDIRECTORY(src)
 
-TRIBITS_ADD_TEST_DIRECTORIES(src/driver)
+# TRIBITS_ADD_TEST_DIRECTORIES(src/driver)
 
 IF(ZOLTAN_BUILD_ZFDRIVE)
   # CMAKE version > 2.6.4 is needed; earlier versions use C++ compiler to link
@@ -88,46 +128,46 @@ IF(ZOLTAN_BUILD_ZFDRIVE)
   TRIBITS_ADD_TEST_DIRECTORIES(src/fdriver)
 ENDIF()
 
-TRIBITS_ADD_TEST_DIRECTORIES(test)
+# TRIBITS_ADD_TEST_DIRECTORIES(test)
+#
+# TRIBITS_ADD_EXAMPLE_DIRECTORIES(example)
 
-TRIBITS_ADD_EXAMPLE_DIRECTORIES(example)
-
-TRIBITS_EXCLUDE_FILES(
-  test/ch_brack2_3
-  test/ch_bug
-  test/ch_degenerate
-  test/ch_degenerateAA
-  test/ch_drake
-  test/ch_grid20x19
-  test/ch_hammond
-  test/ch_hammond2
-  test/ch_hughes
-  test/ch_nograph
-  test/ch_onedbug
-  test/ch_random
-  test/ch_serial
-  test/ch_slac
-  test/hg_cage10
-  test/hg_diag500_4
-  test/hg_ewgt
-  test/hg_felix
-  test/hg_ibm03
-  test/hg_ml27
-  test/hg_nograph
-  test/hg_vwgt
-  test/nem_ti_20k
-  test/nem_ti_4k
-  test/misc_siefert
-  test/th
-  test/bin
-  doc/Zoltan_html/tu_html
-  src/ZoltanComponent
-  src/driver_old
-  src/fdriver_old
-  )
+# TRIBITS_EXCLUDE_FILES(
+#   test/ch_brack2_3
+#   test/ch_bug
+#   test/ch_degenerate
+#   test/ch_degenerateAA
+#   test/ch_drake
+#   test/ch_grid20x19
+#   test/ch_hammond
+#   test/ch_hammond2
+#   test/ch_hughes
+#   test/ch_nograph
+#   test/ch_onedbug
+#   test/ch_random
+#   test/ch_serial
+#   test/ch_slac
+#   test/hg_cage10
+#   test/hg_diag500_4
+#   test/hg_ewgt
+#   test/hg_felix
+#   test/hg_ibm03
+#   test/hg_ml27
+#   test/hg_nograph
+#   test/hg_vwgt
+#   test/nem_ti_20k
+#   test/nem_ti_4k
+#   test/misc_siefert
+#   test/th
+#   test/bin
+#   doc/Zoltan_html/tu_html
+#   src/ZoltanComponent
+#   src/driver_old
+#   src/fdriver_old
+#   )
 
 #
 # D) Do standard postprocessing
 #
 
-TRIBITS_PACKAGE_POSTPROCESS()
+# TRIBITS_PACKAGE_POSTPROCESS()

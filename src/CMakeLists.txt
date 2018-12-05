@@ -4,28 +4,16 @@
 # A) Package-specific configuration options
 #
 
-ASSERT_DEFINED(${PACKAGE_NAME}_ENABLE_METIS)
 SET(HAVE_METIS ${${PACKAGE_NAME}_ENABLE_METIS})
-
-ASSERT_DEFINED(${PACKAGE_NAME}_ENABLE_ParMETIS)
 SET(HAVE_PARMETIS ${${PACKAGE_NAME}_ENABLE_ParMETIS})
-
-ASSERT_DEFINED(${PACKAGE_NAME}_ENABLE_PaToH)
 SET(HAVE_PATOH ${${PACKAGE_NAME}_ENABLE_PaToH})
-
-ASSERT_DEFINED(${PACKAGE_NAME}_ENABLE_Scotch)
 SET(HAVE_SCOTCH ${${PACKAGE_NAME}_ENABLE_Scotch})
-
-ASSERT_DEFINED(${PACKAGE_NAME}_ENABLE_OVIS)
 SET(HAVE_OVIS ${${PACKAGE_NAME}_ENABLE_OVIS})
-
-ASSERT_DEFINED(${PACKAGE_NAME}_ENABLE_Zlib)
 SET(ZHAVE_GZIP ${${PACKAGE_NAME}_ENABLE_Zlib})
-
-ASSERT_DEFINED(${PACKAGE_NAME}_ENABLE_PURIFY)
 SET(HAVE_PURIFY ${${PACKAGE_NAME}_ENABLE_PURIFY})
 
-TRIBITS_CONFIGURE_FILE(${PACKAGE_NAME}_config.h)
+CONFIGURE_FILE("../cmake/Zoltan_config.h.in" 
+  ${CMAKE_CURRENT_BINARY_DIR}/Zoltan_config.h)
 
 #
 # B) Define the header and source files (and directories)
@@ -65,6 +53,7 @@ APPEND_SET(HEADERS
   include/zoltan_dd.h
   Utilities/DDirectory/zoltan_dd_const.h
   include/zoltan_dd_cpp.h
+  # include/zoltan_partition_tree.h
   include/zoltan_mem.h
   include/zoltan_eval.h
   )
@@ -372,6 +361,7 @@ APPEND_SET(SOURCES
   phg/phg_scale.c
   phg/phg_serialpartition.c
   phg/phg_tree.c
+  # phg/phg_partition_tree.c
   phg/phg_two_ways.c
   phg/phg_util.c
   phg/phg_Vcycle.c
@@ -400,6 +390,7 @@ APPEND_SET(SOURCES
   rcb/inertial3d.c
   rcb/point_assign.c
   rcb/rcb_box.c
+  # rcb/rcb_partition_tree.c
   rcb/rcb.c
   rcb/rcb_util.c
   rcb/rib.c
@@ -664,19 +655,23 @@ IF (NOT TPL_ENABLE_MPI)
   SET(DEPLIBS simpi)
 ENDIF()
 
+
+add_library(zoltan STATIC ${SOURCES})
+
 IF(NOT MSVC)
   # Add libm linking for ceil, floor and such.
   LIST(APPEND IMPORTEDLIBS m)
 ENDIF()
 
-TRIBITS_ADD_LIBRARY(
-  zoltan
-  HEADERS ${HEADERS}
-  NOINSTALLHEADERS ${NOINSTALLHEADERS}
-  SOURCES ${SOURCES}
-  DEPLIBS ${DEPLIBS}
-  IMPORTEDLIBS ${IMPORTEDLIBS}
-  )
+TARGET_LINK_LIBRARIES(zoltan ${IMPORTEDLIBS} ${DEPLIBS})
+
+# TRIBITS_ADD_LIBRARY(
+#   zoltan
+#   HEADERS ${HEADERS}
+#   NOINSTALLHEADERS ${NOINSTALLHEADERS}
+#   SOURCES ${SOURCES}
+#   DEPLIBS ${DEPLIBS}
+#   IMPORTEDLIBS ${IMPORTEDLIBS}
+#   )
 
 INSTALL(FILES ${MODULES} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
-
