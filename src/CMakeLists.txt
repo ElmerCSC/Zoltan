@@ -639,9 +639,9 @@ IF(${PROJECT_NAME}_ENABLE_Fortran AND BUILD_ZOLTAN_F90_INTERFACE)
 #  MESSAGE("KDDKDD MODULES " ${MODULES})
 
   APPEND_SET(MODULES
-    ${CMAKE_CURRENT_BINARY_DIR}/zoltan.mod
-    ${CMAKE_CURRENT_BINARY_DIR}/zoltan_types.mod
-    ${CMAKE_CURRENT_BINARY_DIR}/zoltan_user_data.mod
+    ${CMAKE_Fortran_MODULE_DIRECTORY}/zoltan.mod
+    ${CMAKE_Fortran_MODULE_DIRECTORY}/zoltan_types.mod
+    ${CMAKE_Fortran_MODULE_DIRECTORY}/zoltan_user_data.mod
     )
     
 ENDIF()

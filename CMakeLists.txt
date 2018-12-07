@@ -3,16 +3,25 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.9)
 
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_ROOT}/Modules)
 
-INCLUDE(tribits_macros.cmake)
+IF(NOT CMAKE_Fortran_MODULE_DIRECTORY)
+  SET(CMAKE_Fortran_MODULE_DIRECTORY
+    ${PROJECT_BINARY_DIR}/fmodules CACHE PATH "Directory for Fortran modules")
+ENDIF()
+
+INCLUDE(tribits_macros)
 
 # MPI Related things
 SET(TPL_ENABLE_MPI TRUE INTERNAL)
-SET(WITH_MPI TRUE INTERNAL)
 
-SET(PACKAGE_NAME "Zoltan" CACHE STRING "")
+IF(NOT WITH_MPI)
+  MESSAGE(FATAL_ERROR "Zoltan cannot be built in serial")
+ENDIF()
+
+
+SET(PACKAGE_NAME "Zoltan" CACHE STRING "") # TODO: Should this be internal? Or is this even needed? No. TODO: Remove this.
 SET(Zoltan_ENABLE_CXX FALSE CACHE BOOL "")
 SET(Zoltan_ENABLE_Fortran TRUE CACHE BOOL "")
-SET(BUILD_ZOLTAN_F90_INTERFACE CACHE BOOL "")
+SET(BUILD_ZOLTAN_F90_INTERFACE TRUE CACHE BOOL "")
 SET(Zoltan_ENABLE_CPPDRIVER FALSE CACHE BOOL "")
 
 SET(${PACKAGE_NAME}_ENABLE_METIS FALSE CACHE STRING "" )
@@ -44,13 +53,6 @@ ENDIF(WITH_MPI)
 CONFIGURE_FILE("cmake/Zoltan_config.h.in" 
   ${CMAKE_CURRENT_BINARY_DIR}/Zoltan_config.h)
 
-#
-# A) Define the package
-#
-
-#
-# B) Set up package-specific options
-#
 
 TRIBITS_ADD_OPTION_AND_DEFINE( ${PACKAGE_NAME}_ENABLE_UINT_IDS
   UNSIGNED_INT_GLOBAL_IDS
@@ -89,6 +91,7 @@ TRIBITS_ADD_OPTION_AND_DEFINE(${PACKAGE_NAME}_ENABLE_PURIFY
 
 OPTION(${PACKAGE_NAME}_ENABLE_CPPDRIVER "Enable C++ driver for ${PACKAGE_NAME}." ${${PROJECT_NAME}_ENABLE_CXX} )
 
+
 IF (${PROJECT_NAME}_ENABLE_CXX) 
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMPICH_IGNORE_CXX_SEEK")
 ENDIF()
@@ -113,61 +116,20 @@ ENDIF()
 # C) Add the libraries, tests, and examples
 #
 
-# IF (NOT TPL_ENABLE_MPI)
-#   ADD_SUBDIRECTORY(siMPI)
-#   SET(ZOLTAN_BUILD_ZFDRIVE NO)
-# ENDIF()
+IF (NOT TPL_ENABLE_MPI)
+  ADD_SUBDIRECTORY(siMPI)
+  SET(ZOLTAN_BUILD_ZFDRIVE NO)
+ENDIF()
 
 ADD_SUBDIRECTORY(src)
 
-# TRIBITS_ADD_TEST_DIRECTORIES(src/driver)
+# TRIBITS_ADD_TEST_DIRECTORIES(src/driver) # TODO: What is this? Is this needed?
 
-IF(ZOLTAN_BUILD_ZFDRIVE)
+# TODO: Build library only
+# IF(ZOLTAN_BUILD_ZFDRIVE)
   # CMAKE version > 2.6.4 is needed; earlier versions use C++ compiler to link
   # fdriver, while fdriver needs F90.
-  TRIBITS_ADD_TEST_DIRECTORIES(src/fdriver)
-ENDIF()
+  # TRIBITS_ADD_TEST_DIRECTORIES(src/fdriver)
+  # ADD_SUBDIRECTORY(./src/fdriver)
+# ENDIF()
 
-# TRIBITS_ADD_TEST_DIRECTORIES(test)
-#
-# TRIBITS_ADD_EXAMPLE_DIRECTORIES(example)
-
-# TRIBITS_EXCLUDE_FILES(
-#   test/ch_brack2_3
-#   test/ch_bug
-#   test/ch_degenerate
-#   test/ch_degenerateAA
-#   test/ch_drake
-#   test/ch_grid20x19
-#   test/ch_hammond
-#   test/ch_hammond2
-#   test/ch_hughes
-#   test/ch_nograph
-#   test/ch_onedbug
-#   test/ch_random
-#   test/ch_serial
-#   test/ch_slac
-#   test/hg_cage10
-#   test/hg_diag500_4
-#   test/hg_ewgt
-#   test/hg_felix
-#   test/hg_ibm03
-#   test/hg_ml27
-#   test/hg_nograph
-#   test/hg_vwgt
-#   test/nem_ti_20k
-#   test/nem_ti_4k
-#   test/misc_siefert
-#   test/th
-#   test/bin
-#   doc/Zoltan_html/tu_html
-#   src/ZoltanComponent
-#   src/driver_old
-#   src/fdriver_old
-#   )
-
-#
-# D) Do standard postprocessing
-#
-
-# TRIBITS_PACKAGE_POSTPROCESS()
