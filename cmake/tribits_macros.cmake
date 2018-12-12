@@ -150,15 +150,15 @@ FUNCTION(FORTRAN_MANGLING)
 ENDFUNCTION()
 
 
-IF (${PROJECT_NAME}_ENABLE_CXX AND ${PROJECT_NAME}_ENABLE_Fortran)
-  FORTRAN_MANGLING()
+# IF (${PROJECT_NAME}_ENABLE_CXX AND ${PROJECT_NAME}_ENABLE_Fortran)
+FORTRAN_MANGLING()
+# INCLUDE(FortranCInterface)
 
-  # Verify the selected combination of Fortran and C++ compilers.
-  IF(NOT ${PROJECT_NAME}_SKIP_FORTRANCINTERFACE_VERIFY_TEST)
-    INCLUDE(FortranCInterface)
-    FortranCInterface_VERIFY(CXX)
-  ENDIF()
-ENDIF()
+# Verify the selected combination of Fortran and C++ compilers.
+# IF(NOT ${PROJECT_NAME}_SKIP_FORTRANCINTERFACE_VERIFY_TEST)
+  # FortranCInterface_VERIFY(CXX)
+# ENDIF()
+# ENDIF()
 
 IF (FC_FUNC_DEFAULT)
 
