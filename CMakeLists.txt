@@ -123,6 +123,9 @@ ENDIF()
 
 ADD_SUBDIRECTORY(src)
 
+# Install readme containing license of Zoltan
+INSTALL(FILES "README" DESTINATION "share/elmersolver/license_texts/Zoltan")
+
 # TRIBITS_ADD_TEST_DIRECTORIES(src/driver) # TODO: What is this? Is this needed?
 
 # TODO: Build library only
