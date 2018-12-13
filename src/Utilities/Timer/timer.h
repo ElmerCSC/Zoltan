@@ -62,9 +62,10 @@
  * but that has not been implemented here. 
  */
 
-#if defined(__PUMAGON__) || defined(__LIBCATAMOUNT__) || defined(_MSC_VER)
+#if defined(__PUMAGON__) || defined(__LIBCATAMOUNT__) || defined(_MSC_VER) || defined(__MINGW32__)
 /* Tflops with Cougar & Red Storm w/Catamount does not have sysconf() or times() */
 /* Microsoft Visual Studio does not have times either */
+/* Also, MINGW doesn't provide times.h */
 #define NO_TIMES
 #endif /* __PUMAGON__ */
 
