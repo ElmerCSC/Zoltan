@@ -38,10 +38,11 @@ IF(WITH_MPI)
     MPI_EXTRA_LIBRARY
     MPI_LIBRARY
     )
-
-  FIND_PACKAGE(MPI REQUIRED)
-  # Workaround if MPI is found but MPI_FOUND is not set (windows+msmpi+findmpi)
-  SET(MPI_FOUND TRUE CACHE BOOL "")
+  IF (NOT MPI_FOUND)
+    FIND_PACKAGE(MPI REQUIRED)
+    # Workaround if MPI is found but MPI_FOUND is not set (windows+msmpi+findmpi)
+    SET(MPI_FOUND TRUE CACHE BOOL "")
+  ENDIF()
   MARK_AS_ADVANCED(MPI_FOUND)
   INCLUDE_DIRECTORIES(${MPI_Fortran_INCLUDE_PATH})
   # MPI libraries may be needed for testing
