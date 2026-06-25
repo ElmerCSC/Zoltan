@@ -120,27 +120,15 @@ MPI_Comm Zoltan_comm_f2c(int *f_comm)
 /* These routines get the address of an array allocated by fortran and
    return it */
 void Zfw_Get_Address_int(int *addr,
-                         long *ret_addr)
+                         int64_t *ret_addr)
 {
-   /* Assuming sizeof(long) == pointer size.  True on most linux systems. */
-   /* May not be true in 64-bit Windows, but does anyone use F90 on Windoze? */
-   if (sizeof(long) != sizeof(int *)) {
-     ZOLTAN_PRINT_ERROR(-1, "Zfw_Get_Address_int", 
-       "sizeof(long) != sizeof(int *); F90 allocation will not work properly.\n Contact Zoltan developers for help.");
-   }
-   *ret_addr = (long)addr;
+   *ret_addr = (int64_t)(intptr_t)addr;
 }
 
 void Zfw_Get_Address_struct(int *addr,
-			    long *ret_addr)
+			    int64_t *ret_addr)
 {
-   /* Assuming sizeof(long) == pointer size.  True on most linux systems. */
-   /* May not be true in 64-bit Windows, but does anyone use F90 on Windoze? */
-   if (sizeof(long) != sizeof(int *)) {
-     ZOLTAN_PRINT_ERROR(-1, "Zfw_Get_Address_struct", 
-       "sizeof(long) != sizeof(int *); F90 allocation will not work properly.\n Contact Zoltan developers for help.");
-   }
-   *ret_addr = (long)addr;
+   *ret_addr = (int64_t)(intptr_t)addr;
 }
 
 /*****************************************************************************/
