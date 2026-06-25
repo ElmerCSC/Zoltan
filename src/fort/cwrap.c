@@ -63,6 +63,7 @@ extern "C" {
 #endif
 
 
+#include <stdint.h>
 #include "zz_const.h"
 #include "all_allo_const.h"
 #include "cwrap_fmangle.h"
@@ -857,7 +858,7 @@ void Zfw_Destroy(int *addr_lb, int *nbytes)
 {
    volatile struct Zoltan_Struct *lb;
    ADDR_TO_LB(addr_lb, lb);
-   Zoltan_Destroy(&lb);
+   Zoltan_Destroy((struct Zoltan_Struct **)&lb);
 }
 
 /*****************************************************************************/
